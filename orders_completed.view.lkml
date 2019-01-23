@@ -6,7 +6,7 @@ view: orders_completed {
         WHERE status NOT IN ('Cancelled', 'Returned');;
     sql_trigger_value: SELECT CURRENT_DATE ;;
     indexes: ["id"]
-#     distribution_style: all
+    distribution_style: all
   }
 
   dimension: item_id {

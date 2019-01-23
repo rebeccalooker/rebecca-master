@@ -16,7 +16,7 @@ view: user_facts {
       ;;
     sql_trigger_value: SELECT CURRENT_DATE ;;
     indexes: ["customer_id"]
-#     distribution_style: all
+    distribution_style: all
   }
 
   dimension: customer_id {

@@ -7,7 +7,7 @@ view: returns {
         WHERE oi.returned_at IS NOT NULL;;
     sql_trigger_value: SELECT CURRENT_DATE ;;
     indexes: ["customer_id"]
-#     distribution_style: all
+    distribution_style: all
   }
 
   dimension: user_id {
