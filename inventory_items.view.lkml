@@ -1,5 +1,5 @@
 view: inventory_items {
-  sql_table_name: public.inventory_items ;;
+  sql_table_name: thelook_events.INVENTORY_ITEMS ;;
 
   dimension: id {
     primary_key: yes

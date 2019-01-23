@@ -10,13 +10,13 @@ view: user_facts {
           SUM(oi.sale_price) AS customer_total_revenue,
           MIN(oi.created_at) AS first_customer_order,
           MAX(oi.created_at) AS last_customer_order
-        FROM users u
-          JOIN order_items oi ON u.id = oi.user_id
+        FROM ${users.SQL_TABLE_NAME} u
+          JOIN ${order_items.SQL_TABLE_NAME} oi ON u.id = oi.user_id
         GROUP BY customer_id, first_name, last_name, u.age, u.gender
       ;;
     sql_trigger_value: SELECT CURRENT_DATE ;;
     indexes: ["customer_id"]
-    distribution_style: all
+#     distribution_style: all
   }
 
   dimension: customer_id {

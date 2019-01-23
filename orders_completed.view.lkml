@@ -2,11 +2,11 @@ view: orders_completed {
   derived_table: {
     sql:
       SELECT id, order_id, sale_price, returned_at, user_id
-        FROM order_items
+        FROM ${order_items.SQL_TABLE_NAME}
         WHERE status NOT IN ('Cancelled', 'Returned');;
     sql_trigger_value: SELECT CURRENT_DATE ;;
     indexes: ["id"]
-    distribution_style: all
+#     distribution_style: all
   }
 
   dimension: item_id {

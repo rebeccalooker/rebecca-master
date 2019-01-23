@@ -2,12 +2,12 @@ view: returns {
   derived_table: {
     sql:
       SELECT u.id AS customer_id, u.first_name, u.last_name, oi.order_id, oi.id AS item_id
-        FROM users u
-          JOIN order_items oi ON u.id = oi.user_id
+        FROM ${users.SQL_TABLE_NAME} u
+          JOIN ${order_items.SQL_TABLE_NAME} oi ON u.id = oi.user_id
         WHERE oi.returned_at IS NOT NULL;;
     sql_trigger_value: SELECT CURRENT_DATE ;;
     indexes: ["customer_id"]
-    distribution_style: all
+#     distribution_style: all
   }
 
   dimension: user_id {

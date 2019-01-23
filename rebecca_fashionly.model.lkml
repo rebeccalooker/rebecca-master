@@ -104,8 +104,6 @@ explore: product_comparisons {
 }
 
 explore: users {
-  label: "Customers"
-  view_label: "Customer Details"
   fields: [
     ALL_FIELDS*,
     -order_items.user_id,
@@ -116,12 +114,12 @@ explore: users {
     -inventory_items.created_date
     ]
 
-  always_filter: {
-    filters: {
-      field: users.id
-      value: "NOT NULL"
-    }
-  }
+#   always_filter: {
+#     filters: {
+#       field: users.id
+#       value: "NOT NULL"
+#     }
+#   }
 
   join: returns {
     type: left_outer
@@ -148,12 +146,12 @@ explore: users {
     relationship: many_to_one
   }
 
-  join: event_facts {
-    view_label: "Session Details"
-    type: left_outer
-    sql_on: ${users.id} = ${event_facts.user_id} ;;
-    relationship: one_to_many
-  }
+#   join: event_facts {
+#     view_label: "Session Details"
+#     type: left_outer
+#     sql_on: ${users.id} = ${event_facts.user_id} ;;
+#     relationship: one_to_many
+#   }
 
   join: user_facts {
     view_label: "Customer Facts"
@@ -162,29 +160,29 @@ explore: users {
     relationship: one_to_one
   }
 
-  join: user_order_sequences {
-    view_label: "Customer Facts"
-    from: order_sequences
-    type: left_outer
-    relationship: one_to_many
-    sql_on: ${users.id} = ${user_order_sequences.user_id} ;;
-    fields: [user_order_sequences.min_inter_order_days,
-      user_order_sequences.is_quick_repurchase_customer,
-      user_order_sequences.avg_days_between_orders,
-      user_order_sequences.max_days_between_orders]
-  }
+#   join: user_order_sequences {
+#     view_label: "Customer Facts"
+#     from: order_sequences
+#     type: left_outer
+#     relationship: one_to_many
+#     sql_on: ${users.id} = ${user_order_sequences.user_id} ;;
+#     fields: [user_order_sequences.min_inter_order_days,
+#       user_order_sequences.is_quick_repurchase_customer,
+#       user_order_sequences.avg_days_between_orders,
+#       user_order_sequences.max_days_between_orders]
+#   }
 
-  join: order_sequences {
-    view_label: "Orders"
-    type: left_outer
-    relationship: one_to_many
-    sql_on: ${users.id} = ${order_sequences.user_id}
-            and ${order_items.order_id} = ${order_sequences.order_id} ;;
-    fields: [order_sequences.order_sequence_number,
-      order_sequences.days_until_next_order,
-      order_sequences.is_first_purchase,
-      order_sequences.has_subsequent_order]
-  }
+#   join: order_sequences {
+#     view_label: "Orders"
+#     type: left_outer
+#     relationship: one_to_many
+#     sql_on: ${users.id} = ${order_sequences.user_id}
+#             and ${order_items.order_id} = ${order_sequences.order_id} ;;
+#     fields: [order_sequences.order_sequence_number,
+#       order_sequences.days_until_next_order,
+#       order_sequences.is_first_purchase,
+#       order_sequences.has_subsequent_order]
+#   }
 
 #   join: Male {
 #     view_label: "Customer Details"
@@ -201,22 +199,22 @@ explore: users {
 #   }
 }
 
-explore: users_basic_information {
-    label: "Customers Basic"
-    extends: [users]      ## activate the joins so you don't need to retype them
-    view_name: users      ## set view name back to the original explore's base view name
-    from: users_basic
-    hidden: yes
+explore: users_ext {
+  label: "Users+"
+  extends: [users]          ## activate the joins so you don't need to retype them
+  view_name: users      ## set view name back to the original explore's base view name
+  from: users_ext
+  view_label: "Users"
 }
 
 explore: order_items_basic {
   extends: [order_items]
   view_name: order_items
   join: users {
-      from: users_basic
-      type: inner
-      sql_on: ${order_items.user_id} = ${users.id} ;;
-      relationship: many_to_one
+    from: users_ext
+    type: inner
+    sql_on: ${order_items.user_id} = ${users.id} ;;
+    relationship: many_to_one
   }
   hidden: yes
 }

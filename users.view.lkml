@@ -1,7 +1,5 @@
-## 2018-11-20 test comment
-
 view: users {
-  sql_table_name: public.users ;;
+  sql_table_name: thelook_events.USERS ;;
 
   dimension: id {
     primary_key: yes
@@ -12,10 +10,6 @@ view: users {
   dimension: age {
     type: number
     sql: ${TABLE}.age ;;
-    group_label: "{% if  _user_attributes[\"first_name\"] == 'Rebecca' %}
-             {% else %} 'Some Label' {% endif %}"
-    label: "{% if  _user_attributes[\"first_name\"] == 'Rebecca' %}
-             {% else %} 'Age' {% endif %}"
   }
 
   dimension: age_group {
@@ -23,14 +17,13 @@ view: users {
     tiers: [15, 26, 36, 51, 66]
     style: integer
     sql: ${age} ;;
-    group_label: "{% if  _user_attributes[\"first_name\"] == 'Rebecca' %}
-    {% else %} 'Some Label' {% endif %}"
   }
 
   dimension: city {
     group_label: "Address"
     type: string
     sql: ${TABLE}.city ;;
+    hidden: yes
   }
 
   dimension: country {
@@ -38,6 +31,7 @@ view: users {
     type: string
     map_layer_name: countries
     sql: ${TABLE}.country ;;
+    hidden: yes
   }
 
   dimension_group: created {
@@ -55,21 +49,10 @@ view: users {
     convert_tz: no
   }
 
-  dimension: created_date_limit {
-    type: yesno
-    sql: ${created_raw} <= (select max(${created_raw}) from ${TABLE}) ;;
-  }
-
-  dimension: created_quarter_2 {
-    type: date_quarter
-  }
-
   dimension: email {
     type: string
     sql: ${TABLE}.email ;;
-    # html: <span style="width:30px;background-color: red;">{{value}}</span> ;;
-    html: <div style="width:30px">{{value}}</div> ;;
-    tags: ["email"]
+    hidden: yes
   }
 
   dimension: first_name {
@@ -85,6 +68,7 @@ view: users {
   dimension: last_name {
     type: string
     sql: ${TABLE}.last_name ;;
+    hidden: yes
   }
 
   dimension: latitude {
@@ -103,12 +87,14 @@ view: users {
     type: location
     sql_latitude: ${latitude} ;;
     sql_longitude: ${longitude} ;;
+    hidden: yes
   }
 
   dimension: state {
     group_label: "Address"
     type: string
     sql: ${TABLE}.state ;;
+    hidden: yes
   }
 
   dimension: traffic_source {
@@ -120,6 +106,7 @@ view: users {
     group_label: "Address"
     type: zipcode
     sql: ${TABLE}.zip ;;
+    hidden: yes
   }
 
   dimension: is_new_customer {
@@ -130,7 +117,8 @@ view: users {
   # ------ PS Case Study, Use Case #2 ------
   dimension: days_since_signup {
     type: number
-    expression: diff_days(${users.created_date}, now()) ;;
+#     expression: diff_days(${created_date}, now()) ;;
+    sql: DATEDIFF(day, ${created_date}, current_date) ;;
     group_label: "Registration"
   }
 
@@ -158,7 +146,6 @@ view: users {
   # ----------------------------------------
 
   measure: count {
-    label: "{{ _filters['users.gender'] }} Users Count"
     type: count
 #     html:  {{linked_value}} ;;
     drill_fields: [user_details*, events.count]
@@ -209,11 +196,37 @@ view: users {
   # ----------------------------------------
 
   # ------ Filter ------
-  filter: months_ago_when_customer_signed_up {
-    suggest_explore: users
-    suggest_dimension: months_since_signup
+  filter: signup_period_a {
+    type: date
+  }
+
+  filter: signup_period_b {
+    type: date
   }
   # -----------------------
+
+  dimension: is_in_signup_period_a {
+    type: yesno
+    sql: ${id} in (select ${id} from USERS
+                  where {% condition signup_period_a %} ${created_date} {% endcondition %}) ;;
+  }
+
+  dimension: is_in_signup_period_b {
+    type: yesno
+    sql: ${id} in (select ${id} from USERS
+      where {% condition signup_period_b %} ${created_date} {% endcondition %}) ;;
+  }
+
+  measure: count_of_signup_period_a {
+    type: count
+    filters: { field: is_in_signup_period_a value: "Yes" }
+  }
+
+  measure: count_of_signup_period_b {
+    type: count
+    filters: { field: is_in_signup_period_b value: "Yes" }
+  }
+
 
   set: user_details {
     fields: [
@@ -226,54 +239,3 @@ view: users {
     ]
   }
 }
-
-
-# view: Male {
-#   sql_table_name: public.users ;;
-#
-#   dimension: id {
-#     type: number
-#     primary_key: yes
-#     sql: ${TABLE}.id ;;
-#     hidden: yes
-#   }
-#
-#   dimension: gender {
-#     type: string
-#     sql: ${TABLE}.gender ;;
-#     hidden: yes
-#   }
-#
-#   measure: count {
-#     label: "{{ _view._name }} Users Count"
-#     type: count
-#     filters: { field: gender value: "Male" }
-# #     html:  {{linked_value}} ;;
-# #     drill_fields: [user_details*, events.count]
-#   }
-# }
-#
-# view: Female {
-#   sql_table_name: public.users ;;
-#
-#   dimension: id {
-#     type: number
-#     primary_key: yes
-#     sql: ${TABLE}.id ;;
-#     hidden: yes
-#   }
-#
-#   dimension: gender {
-#     type: string
-#     sql: ${TABLE}.gender ;;
-#     hidden: yes
-#   }
-#
-#   measure: count {
-#     label: "{{ _view._name }} Users Count"
-#     type: count
-#     filters: { field: gender value: "Female" }
-# #     html:  {{linked_value}} ;;
-# #     drill_fields: [user_details*, events.count]
-#   }
-# }

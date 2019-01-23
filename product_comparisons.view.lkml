@@ -3,10 +3,10 @@ view: product_comparisons {
     sql: SELECT p.brand, p.category, oi.created_at
           , count(oi.id) as volume_sold
           , sum(oi.sale_price) as revenue
-        FROM public.products as p
-          JOIN public.inventory_items as ii
+        FROM ${products.SQL_TABLE_NAME} as p
+          JOIN ${inventory_items.SQL_TABLE_NAME} as ii
             ON p.id = ii.product_id
-          JOIN public.order_items as oi
+          JOIN ${order_items.SQL_TABLE_NAME} as oi
             ON ii.id = oi.inventory_item_id
         WHERE p.brand != {% parameter compare_brand %}
         {% if compare_category._is_filtered %}

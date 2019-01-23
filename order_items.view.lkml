@@ -1,7 +1,7 @@
 ## 2018-11-20 change the test comment
 
 view: order_items {
-  sql_table_name: public.order_items ;;
+  sql_table_name: thelook_events.ORDER_ITEMS ;;
 
   dimension: id {
     primary_key: yes
