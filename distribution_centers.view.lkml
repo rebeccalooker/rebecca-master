@@ -1,5 +1,5 @@
 view: distribution_centers {
-  sql_table_name: thelook_events.DISTRIBUTION_CENTERS ;;
+  sql_table_name: public.DISTRIBUTION_CENTERS ;;
 
   dimension: id {
     primary_key: yes

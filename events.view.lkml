@@ -1,5 +1,5 @@
 view: events {
-  sql_table_name: thelook_events.EVENTS ;;
+  sql_table_name: public.EVENTS ;;
 
   dimension: id {
     primary_key: yes

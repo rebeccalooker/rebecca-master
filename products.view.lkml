@@ -1,5 +1,5 @@
 view: products {
-  sql_table_name: thelook_events.PRODUCTS ;;
+  sql_table_name: public.PRODUCTS ;;
 
 # ------ Filters ------
   filter: main_brand {

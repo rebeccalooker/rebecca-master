@@ -7,7 +7,7 @@ view: z_bughunt_1 {
       count(id) as count_items_ordered,
       sum(sale_price) as lifetime_sales,
       avg(sale_price) as avg_item_price
-from thelook_events.order_items
+from public.order_items
 group by 1
  ;;
   }
