@@ -6,7 +6,7 @@ view: monthly_user_orders {
     sql: SELECT m1.month
           , m1.user_id
           , coalesce(m1.num_orders_this_month, 0) as num_orders_this_month
-          , case when monthly_user_orders.previous_order_date is null then (
+          , case when m1.previous_order_date is null then (
               select max(previous_order_date)
               from ${monthly_user_orders_with_nulls.SQL_TABLE_NAME} m2
               where m1.user_id = m2.user_id and m2.month < m1.month
