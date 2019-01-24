@@ -2,13 +2,14 @@ view: monthly_user_orders {
   derived_table: {
     sql_trigger_value: select current_date ;;
     distribution_style: all
-    sql: SELECT month_series.month  AS month
-          , user_orders.user_id,
+    sql: SELECT months_and_users.month AS month
+          , months_and_users.user_id
           , user_orders.num_orders_this_month
           , user_orders.previous_order_date
-        FROM ${month_series.SQL_TABLE_NAME} month_series
+        FROM ${months_and_users.SQL_TABLE_NAME} months_and_users
         LEFT OUTER JOIN ${user_orders.SQL_TABLE_NAME} user_orders
-            on month_series.month = user_orders.order_month
+            on months_and_users.month = user_orders.order_month
+            and months_and_users.user_id = user_orders.user_id
         ;;
   }
 
@@ -30,6 +31,19 @@ view: monthly_user_orders {
   dimension: previous_order_date {
     type: date
     sql: ${TABLE}.previous_order_date ;;
+  }
+}
+
+
+view: months_and_users {
+  derived_table: {
+    sql_trigger_value: select current_date ;;
+    distribution_style: all
+    sql: SELECT distinct month_series.month  AS month
+          , order_items.user_id
+        FROM ${month_series.SQL_TABLE_NAME} month_series
+        CROSS JOIN ${order_items.SQL_TABLE_NAME} order_items
+        ;;
   }
 }
 
