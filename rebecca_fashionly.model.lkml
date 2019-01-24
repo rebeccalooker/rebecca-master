@@ -219,11 +219,4 @@ explore: order_items_basic {
   hidden: yes
 }
 
-explore: month_series {
-  fields: [ALL_FIELDS*, -order_items.average_gross_margin, -order_items.total_gross_margin]
-  join: order_items {
-    sql_on: ${month_series.month} = ${order_items.created_month} ;;
-    type: left_outer
-    relationship: one_to_many
-  }
-}
+explore: monthly_user_orders {}

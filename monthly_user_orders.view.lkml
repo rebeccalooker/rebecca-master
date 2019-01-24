@@ -1,6 +1,7 @@
 view: monthly_user_orders {
   derived_table: {
     sql_trigger_value: select current_date ;;
+    distribution_style: all
     sql: SELECT month_series.month  AS month
           , user_orders.user_id,
           , user_orders.num_orders_this_month
@@ -36,9 +37,10 @@ view: monthly_user_orders {
 view: user_orders {
   derived_table: {
     sql_trigger_value: select current_date ;;
+    distribution_style: all
     sql: SELECT TO_CHAR(DATE_TRUNC('month', o1.created_at ), 'YYYY-MM') as order_month
           , o1.user_id  AS user_id
-          , count(distinct order_id) as num_orders_this_month
+          , count(distinct o1.order_id) as num_orders_this_month
           , max(o2.created_at) as previous_order_date
         FROM ${order_items.SQL_TABLE_NAME} o1
         LEFT JOIN ${order_items.SQL_TABLE_NAME} o2 on o1.user_id = o2.user_id
