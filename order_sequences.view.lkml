@@ -4,11 +4,12 @@ view: order_sequences {
     sql: SELECT
           month_series.month  AS month,
           o1.user_id  AS user_id,
-          count(o1.order_id) as num_orders_this_month,
+          count(case when month_series.month = TO_CHAR(DATE_TRUNC('month', o1.created_at ), 'YYYY-MM') then o1.order_id
+                else 0 end) as num_orders_this_month,
           max(o2.created_at) as previous_order_date
         FROM ${month_series.SQL_TABLE_NAME} month_series
-        LEFT JOIN ${order_items.SQL_TABLE_NAME} o1 ON month_series.month = TO_CHAR(DATE_TRUNC('month', o1.created_at ), 'YYYY-MM')
-        LEFT join ${order_items.SQL_TABLE_NAME} o2 on o1.user_id = o2.user_id
+        CROSS JOIN ${order_items.SQL_TABLE_NAME} o1
+        LEFT JOIN ${order_items.SQL_TABLE_NAME} o2 on o1.user_id = o2.user_id
                       and date_trunc('month', o1.created_at) > date_trunc('month', o2.created_at)
         GROUP BY 1,2
         ;;
