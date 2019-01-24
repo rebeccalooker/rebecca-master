@@ -1,23 +1,55 @@
-view: order_sequences {
+view: monthly_user_orders {
   derived_table: {
     sql_trigger_value: select current_date ;;
-    sql: SELECT
-          month_series.month  AS month,
-          o1.user_id  AS user_id,
-          count(case when month_series.month = TO_CHAR(DATE_TRUNC('month', o1.created_at ), 'YYYY-MM') then o1.order_id
-                else 0 end) as num_orders_this_month,
-          max(o2.created_at) as previous_order_date
+    sql: SELECT month_series.month  AS month
+          , user_orders.user_id,
+          , user_orders.num_orders_this_month
+          , user_orders.previous_order_date
         FROM ${month_series.SQL_TABLE_NAME} month_series
-        CROSS JOIN ${order_items.SQL_TABLE_NAME} o1
-        LEFT JOIN ${order_items.SQL_TABLE_NAME} o2 on o1.user_id = o2.user_id
-                      and date_trunc('month', o1.created_at) > date_trunc('month', o2.created_at)
-        GROUP BY 1,2
+        LEFT OUTER JOIN ${user_orders.SQL_TABLE_NAME} user_orders
+            on month_series.month = user_orders.order_month
         ;;
   }
 
   dimension: month {
     type: string
     sql: ${TABLE}.month ;;
+  }
+
+  dimension: user_id {
+    type: number
+    sql: ${TABLE}.user_id ;;
+  }
+
+  dimension: num_orders_this_month {
+    type: number
+    sql: ${TABLE}.num_orders_this_month ;;
+  }
+
+  dimension: previous_order_date {
+    type: date
+    sql: ${TABLE}.previous_order_date ;;
+  }
+}
+
+
+view: user_orders {
+  derived_table: {
+    sql_trigger_value: select current_date ;;
+    sql: SELECT TO_CHAR(DATE_TRUNC('month', o1.created_at ), 'YYYY-MM') as order_month
+          , o1.user_id  AS user_id
+          , count(distinct order_id) as num_orders_this_month
+          , max(o2.created_at) as previous_order_date
+        FROM ${order_items.SQL_TABLE_NAME} o1
+        LEFT JOIN ${order_items.SQL_TABLE_NAME} o2 on o1.user_id = o2.user_id
+                      and date_trunc('month', o1.created_at) > date_trunc('month', o2.created_at)
+        GROUP BY 1, 2
+        ;;
+  }
+
+  dimension: order_month {
+    type: string
+    sql: ${TABLE}.order_month ;;
   }
 
   dimension: user_id {
