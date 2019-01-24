@@ -1,16 +1,25 @@
+## Fills in null "Previous Order Date" values even when user made no orders in a given month.
 view: monthly_user_orders {
   derived_table: {
     sql_trigger_value: select current_date ;;
     distribution_style: all
-    sql: SELECT months_and_users.month AS month
-          , months_and_users.user_id
-          , user_orders.num_orders_this_month
-          , user_orders.previous_order_date
-        FROM ${months_and_users.SQL_TABLE_NAME} months_and_users
-        LEFT OUTER JOIN ${user_orders.SQL_TABLE_NAME} user_orders
-            on months_and_users.month = user_orders.order_month
-            and months_and_users.user_id = user_orders.user_id
+    sql: SELECT m1.month
+          , m1.user_id
+          , coalesce(m1.num_orders_this_month, 0) as num_orders_this_month
+          , case when monthly_user_orders.previous_order_date is null then (
+              select max(previous_order_date)
+              from ${monthly_user_orders_with_nulls.SQL_TABLE_NAME} m2
+              where m1.user_id = m2.user_id and m2.month < m1.month
+              ) else m1.previous_order_date end as previous_order_date
+        FROM ${monthly_user_orders_with_nulls.SQL_TABLE_NAME} m1
         ;;
+  }
+
+  dimension: pk {
+    type: string
+    sql: ${month} || ${user_id} ;;
+    primary_key: yes
+    hidden: yes
   }
 
   dimension: month {
@@ -31,6 +40,67 @@ view: monthly_user_orders {
   dimension: previous_order_date {
     type: date
     sql: ${TABLE}.previous_order_date ;;
+  }
+
+  dimension: is_current {
+    type: yesno
+    sql: ${num_orders_this_month} > 0 and ${previous_order_date} is not null ;;
+  }
+
+  dimension: is_sleeping {
+    type: yesno
+    sql: ${num_orders_this_month} is null and ${previous_order_date} is not null ;;
+  }
+
+  dimension: is_resuscitated {
+    type: yesno
+    sql: ${num_orders_this_month} > 0 and datediff(month, ${previous_order_date}, ${month}) > 1 ;;
+  }
+
+  measure: count_users {
+    type: count_distinct
+    sql: ${user_id} ;;
+  }
+
+  measure: count_users_current {
+    type: count_distinct
+    sql: ${user_id} ;;
+    filters: { field: is_current value: "Yes" }
+  }
+
+  measure: count_users_sleeping {
+    type: count_distinct
+    sql: ${user_id} ;;
+    filters: { field: is_sleeping value: "Yes" }
+  }
+
+  measure: count_users_resuscitated {
+    type: count_distinct
+    sql: ${user_id} ;;
+    filters: { field: is_resuscitated value: "Yes" }
+  }
+
+  measure: count_orders {
+    type: sum
+    sql: ${num_orders_this_month} ;;
+  }
+}
+
+
+## Contains null values for "Previous Order Date" when user made no orders in a given month.
+view: monthly_user_orders_with_nulls {
+  derived_table: {
+    sql_trigger_value: select current_date ;;
+    distribution_style: all
+    sql: SELECT months_and_users.month AS month
+          , months_and_users.user_id
+          , user_orders.num_orders_this_month
+          , user_orders.previous_order_date
+        FROM ${months_and_users.SQL_TABLE_NAME} months_and_users
+        LEFT OUTER JOIN ${user_orders.SQL_TABLE_NAME} user_orders
+            on months_and_users.month = user_orders.order_month
+            and months_and_users.user_id = user_orders.user_id
+        ;;
   }
 }
 
