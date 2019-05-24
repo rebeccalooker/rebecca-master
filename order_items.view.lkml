@@ -279,6 +279,11 @@ view: order_items {
     else null end)) ;;
   }
 
+  measure: latest_order {
+    type: date_time
+    sql: max(${created_time}) ;;
+  }
+
   # ------ Parameters ------
   ## produce "FILTER-ONLY FIELDS" in frontend
   parameter: order_finances {

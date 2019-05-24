@@ -203,7 +203,7 @@ explore: users_ext {
   label: "Users+"
   extends: [users]          ## activate the joins so you don't need to retype them
   view_name: users      ## set view name back to the original explore's base view name
-  from: users_ext
+  from: users_ext       ## change the base view of the Explore to the users_ext view
   view_label: "Users"
 }
 

@@ -44,17 +44,17 @@ view: monthly_user_orders {
 
   dimension: is_current {
     type: yesno
-    sql: ${num_orders_this_month} > 0 and ${previous_order_date} is not null ;;
+    sql: ${num_orders_this_month} > 0 and datediff(month, ${previous_order_date}, cast(${month} || '-01' as date)) = 1 ;;
   }
 
   dimension: is_sleeping {
     type: yesno
-    sql: ${num_orders_this_month} is null and ${previous_order_date} is not null ;;
+    sql: ${num_orders_this_month} = 0 and datediff(month, ${previous_order_date}, cast(${month} || '-01' as date)) >= 1 ;;
   }
 
   dimension: is_resuscitated {
     type: yesno
-    sql: ${num_orders_this_month} > 0 and datediff(month, ${previous_order_date}, ${month}) > 1 ;;
+    sql: ${num_orders_this_month} > 0 and datediff(month, ${previous_order_date}, cast(${month} || '-01' as date)) > 1 ;;
   }
 
   measure: count_users {
