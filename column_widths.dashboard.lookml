@@ -1,3 +1,4 @@
+### Another example
 - dashboard: new_dashboard
   title: New Dashboard
   layout: newspaper
