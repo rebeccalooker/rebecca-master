@@ -1,4 +1,4 @@
-## Example dashboard
+### Example dashboard
 # - dashboard: brand_comparison
 #   title: Brand Comparison
 #   layout: newspaper
