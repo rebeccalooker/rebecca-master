@@ -7,7 +7,7 @@ include: "*.view"
 include: "*.dashboard"
 
 datagroup: rebecca_fashionly_default_datagroup {
-  # sql_trigger: SELECT MAX(id) FROM etl_log;;
+  sql_trigger: SELECT COUNT(*) FROM {{ _user_attributes['my_tables'] }}.columns ;;
   max_cache_age: "1 hour"
 }
 
@@ -217,6 +217,18 @@ explore: order_items_basic {
     relationship: many_to_one
   }
   hidden: yes
+}
+
+explore: users_with_ndt {
+  extends: [users]
+  view_name: users
+  from: users
+
+  join: user_facts_ndt {
+    sql_on: ${users.id} = ${user_facts_ndt.id} ;;
+    type: inner
+    relationship: one_to_one
+  }
 }
 
 explore: monthly_user_orders {}
