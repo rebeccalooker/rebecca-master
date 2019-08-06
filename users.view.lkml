@@ -57,7 +57,9 @@ view: users {
 
   dimension: first_name {
     type: string
-    sql: ${TABLE}.first_name ;;
+    sql: INITCAP(${TABLE}.first_name) ;;
+    suggest_explore: users
+    suggest_dimension: users.last_name
   }
 
   dimension: gender {
@@ -68,7 +70,7 @@ view: users {
   dimension: last_name {
     type: string
     sql: ${TABLE}.last_name ;;
-    hidden: yes
+    hidden: no
   }
 
   dimension: latitude {

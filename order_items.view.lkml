@@ -86,6 +86,8 @@ view: order_items {
   dimension: status {
     type: string
     sql: ${TABLE}.status ;;
+    suggest_explore: users
+    suggest_dimension: users.first_name
   }
 
   dimension: user_id {
@@ -121,6 +123,7 @@ view: order_items {
     label: "Items Ordered"
     type: count
     drill_fields: [detail*]
+    html: some other html ;;
   }
 
   measure: total_sale_price {

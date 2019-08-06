@@ -46,6 +46,7 @@ explore: order_items {
     type: left_outer
     sql_on: ${order_items.user_id} = ${users.id} ;;
     relationship: many_to_one
+    sql_where: ${users.country} = 'US' ;;
   }
 
   join: inventory_items {
@@ -112,7 +113,7 @@ explore: users {
     -inventory_items.product_distribution_center_id,
     -inventory_items.product_id,
     -inventory_items.created_date
-    ]
+  ]
 
 #   always_filter: {
 #     filters: {
@@ -220,7 +221,7 @@ explore: order_items_basic {
 }
 
 explore: users_with_ndt {
-  extends: [users]
+  extends: [users_]
   view_name: users
   from: users
 
