@@ -1,6 +1,12 @@
 view: users {
   sql_table_name: public.USERS ;;
 
+  parameter: all_or_completed_orders {
+    type: unquoted
+    allowed_value: { label: "All Orders" value: "all" }
+    allowed_value: { label: "Completed Orders" value: "completed" }
+  }
+
   dimension: id {
     primary_key: yes
     type: number
@@ -228,6 +234,23 @@ view: users {
     type: count
     filters: { field: is_in_signup_period_b value: "Yes" }
   }
+
+### Playing around with dynamic view selection for Wave HQ
+#   measure: count_orders_dynamic {
+#     type: number
+#     sql: {% if all_or_completed_orders._parameter_value == 'all' %} ${dynamic_view.count_orders_made}
+#           {% else %} ${dynamic_view.orders_completed} {% endif %} ;;
+#   }
+#
+#   measure: count_orders_made {
+#     type: number
+#     sql: ${order_items.count_orders_made} ;;
+#   }
+#
+#   measure: count_orders_completed {
+#     type: number
+#     sql: ${orders_completed.orders_completed} ;;
+#   }
 
 
   set: user_details {

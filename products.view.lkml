@@ -61,6 +61,10 @@ view: products {
     sql: ${TABLE}.distribution_center_id ;;
   }
 
+  dimension: distribution_center_name {
+    sql: (select name from ${distribution_centers.SQL_TABLE_NAME}) ;;
+  }
+
   dimension: name {
     type: string
     sql: ${TABLE}.name ;;

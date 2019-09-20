@@ -1,3 +1,13 @@
+include: "order_items.view"
+view: dynamic_view {
+  extends: [order_items, orders_completed]
+  sql_table_name: {% if users.all_or_completed_orders._parameter_value == 'all' %} ${order_items.SQL_TABLE_NAME}
+                  {% else %} ${orders_completed.SQL_TABLE_NAME} {% endif %} ;;
+
+  dimension: item_id { primary_key: no }
+}
+
+
 view: orders_completed {
   derived_table: {
     sql:
@@ -7,6 +17,12 @@ view: orders_completed {
     sql_trigger_value: SELECT CURRENT_DATE ;;
     indexes: ["id"]
     distribution_style: all
+  }
+
+  parameter: profit_or_margin {
+    type: unquoted
+    allowed_value: { label: "Average Order Profit" value: "profit" }
+    allowed_value: { label: "Gross Margin %" value: "margin" }
   }
 
   dimension: item_id {
@@ -43,6 +59,14 @@ view: orders_completed {
   measure: orders_completed {
     type: count_distinct
     sql: ${order_id} ;;
+  }
+
+  measure: dynamic_measure {
+    type: number
+    sql: {% if profit_or_margin._parameter_value == 'profit' %} ${average_order_profit}
+          {% else %} ${gross_margin_percentage} {% endif %} ;;
+    html: {% if profit_or_margin._parameter_value == 'profit' %} {{ average_order_profit._rendered_value }}
+          {% else %} {{ gross_margin_percentage._rendered_value }} {% endif %} ;;
   }
 
   measure: gross_margin_percentage {

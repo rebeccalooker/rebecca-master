@@ -42,6 +42,9 @@ persist_with: rebecca_fashionly_default_datagroup
 # }
 
 explore: order_items {
+  fields: [ALL_FIELDS*,
+#     -users.count_orders_dynamic
+    ]
   join: users {
     type: left_outer
     sql_on: ${order_items.user_id} = ${users.id} ;;
@@ -61,11 +64,11 @@ explore: order_items {
     relationship: many_to_one
   }
 
-  join: distribution_centers {
-    type: left_outer
-    sql_on: ${products.distribution_center_id} = ${distribution_centers.id} ;;
-    relationship: many_to_one
-  }
+#   join: distribution_centers {
+#     type: left_outer
+#     sql_on: ${products.distribution_center_id} = ${distribution_centers.id} ;;
+#     relationship: many_to_one
+#   }
 
   join: returns {
     type: left_outer
@@ -115,17 +118,10 @@ explore: users {
     -inventory_items.created_date
   ]
 
-#   always_filter: {
-#     filters: {
-#       field: users.id
-#       value: "NOT NULL"
-#     }
-#   }
-
-  join: returns {
+  join: dynamic_view {
     type: left_outer
-    sql_on: ${users.id} = ${returns.user_id} ;;
-    relationship: one_to_one
+    sql_on: ${users.id} = ${dynamic_view.order_id} ;;
+    relationship: many_to_one
   }
 
   join: order_items {
@@ -139,6 +135,12 @@ explore: users {
     type: left_outer
     sql_on: ${users.id} = ${orders_completed.user_id} ;;
     relationship: one_to_many
+  }
+
+  join: returns {
+    type: left_outer
+    sql_on: ${users.id} = ${returns.user_id} ;;
+    relationship: one_to_one
   }
 
   join: inventory_items {
@@ -221,7 +223,7 @@ explore: order_items_basic {
 }
 
 explore: users_with_ndt {
-  extends: [users_]
+  extends: [users]
   view_name: users
   from: users
 
@@ -233,3 +235,7 @@ explore: users_with_ndt {
 }
 
 explore: monthly_user_orders {}
+
+explore: dynamic_table {
+  fields: [id, created_date]
+}

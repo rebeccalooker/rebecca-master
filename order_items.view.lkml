@@ -46,7 +46,7 @@ view: order_items {
   dimension: order_id {
     type: number
     sql: ${TABLE}.order_id ;;
-    html: <img src="https://avatars0.githubusercontent.com/u/1437874?s=400&v=4" height="42" width="42"> ;;
+#     html: <img src="https://avatars0.githubusercontent.com/u/1437874?s=400&v=4" height="42" width="42"> ;;
   }
 
   dimension_group: returned {
@@ -123,7 +123,7 @@ view: order_items {
     label: "Items Ordered"
     type: count
     drill_fields: [detail*]
-    html: some other html ;;
+#     html: some other html ;;
   }
 
   measure: total_sale_price {
