@@ -238,6 +238,6 @@ explore: monthly_user_orders {}
 
 explore: dynamic_table {
   fields: [dynamic_table.id, dynamic_table.created_date,
-#     dynamic_table.select_table
+    dynamic_table.select_table
     ]
 }
