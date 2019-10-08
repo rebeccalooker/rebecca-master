@@ -1,10 +1,11 @@
 connection: "thelook_events_redshift"
 
 # include all the views
-include: "*.view"
+include: "/*.view"
+include: "/data_tests.lkml"
 
 # include all the dashboards
-include: "*.dashboard"
+include: "/Examples/*.dashboard"
 
 datagroup: rebecca_fashionly_default_datagroup {
   sql_trigger: SELECT COUNT(*) FROM {{ _user_attributes['my_tables'] }}.columns ;;
@@ -13,33 +14,20 @@ datagroup: rebecca_fashionly_default_datagroup {
 
 persist_with: rebecca_fashionly_default_datagroup
 
-# explore: bsandell {}
 
-# explore: company_list {}
+explore: events {
+  fields: [ALL_FIELDS*, -users.average_spend_per_customer
+                      , -users.total_sales_new_customers
+                      , -users.number_of_customers_returning_items
+                      , -users.percent_of_users_with_returns
+                      , ]
+  join: users {
+   type: left_outer
+   sql_on: ${events.user_id} = ${users.id} ;;
+   relationship: many_to_one
+  }
+}
 
-# explore: distribution_centers {}
-
-# explore: events {
-#  join: users {
-#    type: left_outer
-#    sql_on: ${events.user_id} = ${users.id} ;;
-#    relationship: many_to_one
-#  }
-# }
-
-# explore: inventory_items {
-#  join: products {
-#    type: left_outer
-#    sql_on: ${inventory_items.product_id} = ${products.id} ;;
-#    relationship: many_to_one
-#  }
-
-#  join: distribution_centers {
-#    type: left_outer
-#    sql_on: ${products.distribution_center_id} = ${distribution_centers.id} ;;
-#    relationship: many_to_one
-#  }
-# }
 
 explore: order_items {
   fields: [ALL_FIELDS*,
@@ -185,20 +173,6 @@ explore: users {
 #       order_sequences.days_until_next_order,
 #       order_sequences.is_first_purchase,
 #       order_sequences.has_subsequent_order]
-#   }
-
-#   join: Male {
-#     view_label: "Customer Details"
-#     sql_on: ${users.id} = ${Male.id} ;;
-#     type: inner
-#     relationship: one_to_one
-#   }
-#
-#   join: Female {
-#     view_label: "Customer Details"
-#     sql_on: ${users.id} = ${Female.id} ;;
-#     type: inner
-#     relationship: one_to_one
 #   }
 }
 

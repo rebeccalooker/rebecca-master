@@ -133,6 +133,13 @@ view: order_items {
     drill_fields: [product_pricing*]
   }
 
+  measure: total_sales_to_women {
+    type: sum
+    sql: ${sale_price} ;;
+    value_format_name: usd
+    filters: { field: users.gender value: "f" }
+  }
+
   measure: average_sale_price {
     type: average
     sql: ${sale_price} ;;
