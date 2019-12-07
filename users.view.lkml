@@ -7,15 +7,23 @@ view: users {
     allowed_value: { label: "Completed Orders" value: "completed" }
   }
 
+  filter: user_name_for_id {
+    suggest_dimension: full_name
+    sql: ${id} = (select ${id} from ${TABLE}
+          where {% condition user_name_for_id %} ${full_name} {% endcondition %}) ;;
+  }
+
   dimension: id {
     primary_key: yes
     type: number
     sql: ${TABLE}.id ;;
+    html:     <div style="width:300px;text-align:center;background-color:#ffffff;border:5px solid #e3e3e3;vertical-align:middle;font-size:24px;@{html_format__style_bold_for_certain_kpis}"><div>{{rendered_value}}</div></div>;;
   }
 
   dimension: age {
     type: number
     sql: ${TABLE}.age ;;
+    required_access_grants: [info_for_not_nothugo]
   }
 
   dimension: age_group {
@@ -64,8 +72,13 @@ view: users {
   dimension: first_name {
     type: string
     sql: INITCAP(${TABLE}.first_name) ;;
-    suggest_explore: users
-    suggest_dimension: users.last_name
+    # suggest_explore: users
+    # suggest_dimension: users.last_name
+  }
+
+  dimension: full_name {
+    type: string
+    sql: ${first_name} || ' ' || ${last_name} ;;
   }
 
   dimension: gender {
@@ -75,7 +88,7 @@ view: users {
 
   dimension: last_name {
     type: string
-    sql: ${TABLE}.last_name ;;
+    sql: INITCAP(${TABLE}.last_name) ;;
     hidden: no
   }
 
@@ -153,8 +166,12 @@ view: users {
   }
   # ----------------------------------------
 
-  measure: count {
+  measure: count_of_users {
     type: count
+    link: {
+      label: "Testing"
+      url: "{{ link }}"
+    }
 #     html:  {{linked_value}} ;;
     drill_fields: [user_details*, events.count]
   }
@@ -233,6 +250,12 @@ view: users {
   measure: count_of_signup_period_b {
     type: count
     filters: { field: is_in_signup_period_b value: "Yes" }
+  }
+
+  measure: max_age {
+    type: max
+    sql: ${age} ;;
+    html:     <div class="vis" style="text-align:center;background-color:#ffffff;border:5px solid #e3e3e3;vertical-align:middle;font-size:20px;@{html_format__style_bold_for_certain_kpis}">     <div>{{rendered_value}}</div></div>;;
   }
 
 ### Playing around with dynamic view selection for Wave HQ

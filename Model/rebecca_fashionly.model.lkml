@@ -3,9 +3,12 @@ connection: "thelook_events_redshift"
 # include all the views
 include: "/*.view"
 include: "/data_tests.lkml"
+include: "/data_tests_2.view"
 
 # include all the dashboards
 include: "/Examples/*.dashboard"
+
+aggregate_awareness: yes
 
 datagroup: rebecca_fashionly_default_datagroup {
   sql_trigger: SELECT COUNT(*) FROM {{ _user_attributes['my_tables'] }}.columns ;;
@@ -14,6 +17,10 @@ datagroup: rebecca_fashionly_default_datagroup {
 
 persist_with: rebecca_fashionly_default_datagroup
 
+access_grant: info_for_not_nothugo {      # my own value is 'nothugo'
+  user_attribute: department
+  allowed_values: ["hugo"]
+}
 
 explore: events {
   fields: [ALL_FIELDS*, -users.average_spend_per_customer
@@ -33,11 +40,14 @@ explore: order_items {
   fields: [ALL_FIELDS*,
 #     -users.count_orders_dynamic
     ]
+#   always_filter: {
+#     filters: { field: order_items.created_date value: "3 days" }
+#   }
   join: users {
     type: left_outer
     sql_on: ${order_items.user_id} = ${users.id} ;;
     relationship: many_to_one
-    sql_where: ${users.country} = 'US' ;;
+#     sql_where: ${users.country} = 'US' ;;
   }
 
   join: inventory_items {
@@ -182,6 +192,20 @@ explore: users_ext {
   view_name: users      ## set view name back to the original explore's base view name
   from: users_ext       ## change the base view of the Explore to the users_ext view
   view_label: "Users"
+}
+
+explore: custom_dimension_test {
+  from: users_ext
+  view_name: users_ext
+  fields: [ALL_FIELDS*,
+          users_ext.total_sales_to_women,
+          users_ext.average_gross_margin,
+          users_ext.total_gross_margin,
+          users_ext.average_spend_per_customer,
+          users_ext.total_sales_new_customers,
+          users_ext.number_of_customers_returning_items,
+          users_ext.percent_of_users_with_returns,
+          ]
 }
 
 explore: order_items_basic {

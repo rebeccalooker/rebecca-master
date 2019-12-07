@@ -1,47 +1,16 @@
-# ------ This makes sure the LDE can find the view to extend ------
-include: "users*"
-# -----------------------------------------------------------------
+# ------ This makes sure the LDE can find the views to extend ------
+include: "users.view"
+include: "order_items.view"
+include: "events.view"
+# ------------------------------------------------------------------
 
 view: users_ext {
-  extends: [users]
-
-  dimension: city {
-    hidden: no
-  }
-
-  dimension: country {
-    hidden: no
-  }
-
-  dimension: email {
-    hidden: no
-  }
-
-  dimension: last_name {
-    hidden: no
-  }
-
-  dimension: latitude {
-    hidden: no
-  }
-
-  dimension: longitude {
-    hidden: no
-  }
-
-  dimension: customer_location {
-    hidden: no
-  }
-
-  dimension: state {
-    hidden: no
-  }
-
-  dimension: zip {
-    hidden: no
-  }
-
-  dimension: is_new_customer {
-    sql: ${days_since_signup} <= 60 ;;
-  }
+  sql_table_name: {% if created_date._in_query %}
+                    public.users
+                  {% elsif created_month._in_query %}
+                    public.order_items
+                  {% else %}
+                    public.events
+                  {% endif %} ;;
+  extends: [users, order_items, events]
 }

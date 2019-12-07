@@ -1,20 +1,20 @@
-# include: "/Model/rebecca_fashionly.model"
+include: "/Model/rebecca_fashionly.model"
 
-test: test_recent_event_data {
+test: test_recent_event_data_2 {
   explore_source: events {
     column: count { field: events.count }
     filters: {
 #       field: created_date
-      field: events.created_date
-      value: "3 days"
-    }
-  }
-  assert: recent_events_exist {
-    expression: ${events.count} > 0 ;;
+    field: events.created_date
+    value: "3 days"
   }
 }
+assert: recent_events_exist {
+  expression: ${events.count} > 0 ;;
+}
+}
 
-test: test_2018_event_data {
+test: test_2018_event_data_2 {
   explore_source: events {
     column: count { field: events.count }
     filters: {

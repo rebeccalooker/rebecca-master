@@ -3,6 +3,12 @@
 view: order_items {
   sql_table_name: public.ORDER_ITEMS ;;
 
+  parameter: select_returned_month {
+    type: string
+#     suggest_explore: order_items
+    suggest_dimension: returned_month_string
+  }
+
   dimension: id {
     primary_key: yes
     type: number
@@ -63,6 +69,17 @@ view: order_items {
     sql: ${TABLE}.returned_at ;;
   }
 
+  dimension: returned_month_reverse {
+    type: string
+    sql: 9999999999 - extract('epoch' from cast(concat(${returned_month}, '-01') as date));;
+  }
+
+  dimension: returned_month_string {
+    type: string
+    sql: ${returned_month} ;;
+    order_by_field: returned_month_reverse
+  }
+
   dimension: sale_price {
     type: number
     sql: ${TABLE}.sale_price ;;
@@ -116,7 +133,8 @@ view: order_items {
       users.id,
       users.first_name,
       users.last_name,
-      order_id]
+      order_id
+      ]
   }
 
   measure: count_items_ordered {
@@ -204,6 +222,15 @@ view: order_items {
       field: returned_time
       value: "-NULL"
     }
+  }
+
+  measure: items_returned_with_drill {
+    type: count_distinct
+    sql: ${id} ;;
+    filters: {
+      field: returned_time
+      value: "-NULL"
+    }
     drill_fields: [detail*, sale_price]
     link: {
       label: "Explore Top 10 Results"
@@ -250,6 +277,12 @@ view: order_items {
       ]}]}' %}
       {{ items_returned._link}}&sorts=order_items.sale_price+desc&limit=20"
     }
+  }
+
+  measure: items_returned_with_rate {
+    type: number
+    sql: ${items_returned} ;;
+    html: {{ rendered_value }} Items Returned | {{ item_return_rate._rendered_value }} Return Rate ;;
   }
 
   measure: item_return_rate {

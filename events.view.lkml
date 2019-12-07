@@ -103,3 +103,17 @@ view: events {
     drill_fields: [id, users.id, users.first_name, users.last_name]
   }
 }
+
+
+test: testing_event_data_in_view_file {
+  explore_source: events {
+    column: count { field: events.count }
+    filters: {
+      field: created_date
+      value: "3 days"
+    }
+  }
+  assert: recent_events_exist {
+    expression: ${orders.count} > 0 ;;
+  }
+}
