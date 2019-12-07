@@ -1,4 +1,4 @@
-connection: "thelook_events_redshift"
+connection: "thelook_events"
 
 # include all the views
 include: "/*.view"

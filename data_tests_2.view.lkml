@@ -1,4 +1,4 @@
-include: "/Model/rebecca_fashionly.model"
+include: "/Model/rebecca.model"
 
 test: test_recent_event_data_2 {
   explore_source: events {
