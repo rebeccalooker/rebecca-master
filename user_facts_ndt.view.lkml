@@ -4,6 +4,7 @@
 
 view: user_facts_ndt {
   derived_table: {
+    publish_as_db_view: yes
     datagroup_trigger: rebecca_fashionly_default_datagroup
     distribution_style: even
     sortkeys: ["id"]
