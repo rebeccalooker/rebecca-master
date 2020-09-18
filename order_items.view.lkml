@@ -9,6 +9,31 @@ view: order_items {
     suggest_dimension: returned_month_string
   }
 
+  parameter: test_underscore {
+    type: string
+    allowed_value: {
+      label: "Test 1"
+      value: "test_1"
+    }
+    allowed_value: {
+      label: "Test 2"
+      value: "test_2"
+    }
+    allowed_value: {
+      label: "Test 3"
+      value: "test_3"
+    }
+    default_value: "test_3"
+  }
+
+  dimension: using_test_underscore {
+    type: number
+    sql: {% if test_underscore._parameter_value == "'test_1'" %} 1
+        {% elsif test_underscore._parameter_value == "'test_2'" %} 2
+        {% else %} 3
+        {% endif %};;
+  }
+
   dimension: id {
     primary_key: yes
     type: number
